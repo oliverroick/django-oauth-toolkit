@@ -8,14 +8,8 @@ import oauth2_provider.generators
 from django.conf import settings
 
 
-class Migration(migrations.Migration):
-
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        migrations.swappable_dependency(oauth2_settings.APPLICATION_MODEL),
-    ]
-
-    operations = [
+def create_application_model(apps, schema_editor):
+    if oauth2_settings.APPLICATION_MODEL == 'oauth2_provider.Application':
         migrations.CreateModel(
             name='Application',
             fields=[
@@ -32,6 +26,17 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        migrations.swappable_dependency(oauth2_settings.APPLICATION_MODEL),
+    ]
+
+    operations = [
+        migrations.RunPython(create_application_model),
         migrations.CreateModel(
             name='AccessToken',
             fields=[

@@ -8,6 +8,22 @@ import oauth2_provider.generators
 from django.conf import settings
 
 
+def alter_application_fields(apps, schema_editor):
+    if oauth2_settings.APPLICATION_MODEL == 'oauth2_provider.Application':
+        migrations.AddField(
+            model_name='Application',
+            name='skip_authorization',
+            field=models.BooleanField(default=False),
+            preserve_default=True,
+        )
+        migrations.AlterField(
+            model_name='Application',
+            name='user',
+            field=models.ForeignKey(related_name='oauth2_provider_application', to=settings.AUTH_USER_MODEL),
+            preserve_default=True,
+        ),
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,18 +31,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-             model_name='Application',
-             name='skip_authorization',
-             field=models.BooleanField(default=False),
-             preserve_default=True,
-        ),
-        migrations.AlterField(
-            model_name='Application',
-            name='user',
-            field=models.ForeignKey(related_name='oauth2_provider_application', to=settings.AUTH_USER_MODEL),
-            preserve_default=True,
-        ),
+        migrations.RunPython(alter_application_fields),
+        # migrations.AddField(
+        #      model_name='Application',
+        #      name='skip_authorization',
+        #      field=models.BooleanField(default=False),
+        #      preserve_default=True,
+        # ),
+        # migrations.AlterField(
+        #     model_name='Application',
+        #     name='user',
+        #     field=models.ForeignKey(related_name='oauth2_provider_application', to=settings.AUTH_USER_MODEL),
+        #     preserve_default=True,
+        # ),
         migrations.AlterField(
             model_name='AccessToken',
             name='user',
